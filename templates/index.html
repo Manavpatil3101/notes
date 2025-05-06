@@ -1,0 +1,105 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Keep Clone</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            roboto: ['Roboto', 'sans-serif'],
+          },
+        }
+      }
+    }
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+
+<body class="bg-gray-100 min-h-screen text-gray-800 transition-colors duration-300">
+  <header class="flex items-center justify-between px-8 py-4 bg-white shadow-md dark:bg-gray-800 dark:text-white">
+    <div class="flex items-center gap-3">
+      <img src="{% static 'keep-icon.png' %}" alt="Keep Icon" class="h-8">
+      <h1 class="text-xl font-medium">Keep Clone</h1>
+    </div>
+    <input type="text" id="searchBar" placeholder="Search notes..." class="w-2/5 px-4 py-2 bg-gray-200 dark:bg-gray-700 text-black dark:text-white rounded-full focus:outline-none">
+    <div class="flex items-center gap-4">
+      <button id="darkModeToggle" class="text-lg">🌙</button>
+      <h3 class="text-yellow-600 rounded-full bg-white h-[30px] w-[30px] uppercase flex items-center justify-center">{{username}}</h3>
+      <form action="logout" method="post">
+        {% csrf_token %}
+        <button type="submit">LogOut</button>
+      </form>
+    </div>
+  </header>
+
+  <nav class="bg-white dark:bg-gray-800 border-y border-gray-300 dark:border-gray-700 px-8 py-3">
+    <ul class="flex gap-6 font-medium">
+      <li class="cursor-pointer text-yellow-500 border-b-2 border-yellow-500">Notes</li>
+      <li class="cursor-pointer hover:text-yellow-500">Reminders</li>
+      <li class="cursor-pointer hover:text-yellow-500">Labels</li>
+      <li class="cursor-pointer hover:text-yellow-500">Archive</li>
+      <li class="cursor-pointer hover:text-yellow-500">Trash</li>
+    </ul>
+  </nav>
+
+  <main class="p-6">
+    <section class="max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 mb-6">
+      <form action="add_task" method="post">
+        {% csrf_token %}
+        <input type="text" name="task" id="noteTitle" placeholder="Title" class="w-full border-b border-gray-200 dark:border-gray-600 bg-transparent py-2 px-2 focus:outline-none text-black dark:text-white">
+        <textarea id="noteContent" name="note" placeholder="Take a note..." class="w-full mt-2 border-b border-gray-200 dark:border-gray-600 bg-transparent py-2 px-2 focus:outline-none resize-none text-black dark:text-white"></textarea>
+        <div class="text-right mt-2">
+          <button type="submit" class="bg-yellow-400 hover:bg-yellow-500 text-white text-sm px-4 py-1 rounded-md">Add</button>
+        </div>
+      </form>
+    </section>
+
+    <section id="notesContainer" class="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+      {% for task in tasks %}
+        <div class="task bg-white dark:bg-gray-800 p-4 rounded-xl shadow-md" data-task-id="{{ task.id }}">
+          <h2 class="font-bold text-2xl text-black dark:text-white">{{ task.title }}</h2>
+          <h3 class="text-gray-700 dark:text-gray-300">{{ task.note }}</h3>
+
+          <!-- Star Toggle (Django Form) -->
+          <form action="{% url 'toggle_star' task.id %}" method="post" class="mt-2 inline-block">
+            {% csrf_token %}
+            <button type="submit">
+              {% if task.is_starred %}
+                <img src="{% static 'assets/icons/star (1).png' %}" alt="Starred" class="inline w-8 h-8 my-4">
+              {% else %}
+                <img src="{% static 'assets/icons/star.png' %}" alt="Not Starred" class="inline w-8 h-8 my-4">
+              {% endif %}
+            </button>
+          </form>
+
+          <!-- Delete button -->
+          <form action="{% url 'delete_task' task.id %}" method="post" class="mt-2">
+            {% csrf_token %}
+            <button type="submit" class="bg-yellow-300 text-white px-4 py-2 rounded-md hover:bg-yellow-500 transition duration-300">
+              Completed (Delete)
+            </button>
+          </form>
+        </div>
+      {% endfor %}
+    </section>
+  </main>
+
+  <footer class="text-center py-4 bg-white dark:bg-gray-800 shadow-inner dark:text-white">
+    <p>&copy; 2025 Keep Clone. All rights reserved.</p>
+  </footer>
+
+  <!-- JavaScript: only for dark mode toggle -->
+  <script>
+    document.getElementById("darkModeToggle").addEventListener("click", () => {
+      document.documentElement.classList.toggle("dark");
+    });
+  </script>
+</body>
+</html>
