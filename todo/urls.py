@@ -8,4 +8,7 @@ urlpatterns = [
     path('logout', views.logout_view, name='logout'),
     path('login', views.login_view, name='login'),
     path('toggle_star/<int:task_id>/', views.toggle_star, name='toggle_star'),
+    path('abc/', views.abc, name='abc'),
+    path('favourites/', views.favourites, name='favourites'),
+    path('register', views.register, name='register'),
 ]

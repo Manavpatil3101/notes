@@ -1,0 +1,56 @@
+{% load static %}
+
+<script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            roboto: ['Roboto', 'sans-serif'],
+          },
+        }
+      }
+    }
+  </script>
+
+
+<header class="flex items-center justify-between px-8 py-4 bg-white shadow-md dark:bg-gray-800 dark:text-white">
+    <div class="flex items-center gap-3">
+        <img src="{% static 'keep-icon.png' %}" alt="Keep Icon" class="h-8">
+        <h1 class="text-xl font-medium">Keep Clone</h1>
+    </div>
+    <input type="text" id="searchBar" placeholder="Search notes..."
+        class="w-2/5 px-4 py-2 bg-gray-200 dark:bg-gray-700 text-black dark:text-white rounded-full focus:outline-none">
+    <div class="flex items-center gap-4">
+        <!-- <button id="darkModeToggle" class="text-lg">🌙</button> -->
+        <h3 class="text-yellow-600 rounded-full bg-white h-[30px] w-[30px] uppercase flex items-center justify-center">
+            {{username}}</h3>
+        <form action="logout" method="post">
+            {% csrf_token %}
+            <button type="submit">LogOut</button>
+        </form>
+    </div>
+</header>
+
+<nav class="bg-white dark:bg-gray-800 border-y border-gray-300 dark:border-gray-700 px-8 py-3">
+    <ul class="flex gap-6 font-medium">
+        <a>
+            <li class="cursor-pointer text-yellow-500 border-b-2 border-yellow-500">Notes</li>
+        </a>
+        <a href="{% url 'favourites' %}">
+            <li class="text-white cursor-pointer hover:text-yellow-500">Favourites</li>
+        </a>
+        <a href="{% url 'abc' %}">
+            <li class="cursor-pointer text-white hover:text-yellow-500">ABC</li>
+        </a>
+
+
+    </ul>
+</nav>
+
+
+<script>
+    document.getElementById("darkModeToggle").addEventListener("click", () => {
+        document.documentElement.classList.toggle("dark");
+    });
+</script>

@@ -1,8 +1,11 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from .models import Task
 from django.shortcuts import redirect, get_object_or_404
+
+from django.http import JsonResponse
 
 # Create your views here.
 
@@ -12,7 +15,7 @@ def toggle_star(request, task_id):
     task = get_object_or_404(Task, id=task_id)
     task.is_starred = not task.is_starred
     task.save()
-    return redirect('index')
+    return JsonResponse({'status': 'success', 'is_starred': task.is_starred})
 
 
 
@@ -57,3 +60,31 @@ def login_view(request):
             return render(request, 'login.html', {'error': 'Invalid Credentials'})
     else:
         return render(request, 'login.html')
+
+
+
+def abc(request):
+    return render(request, 'abc.html')
+def favourites(request):
+    return render(request, 'favourites.html')
+
+def register(request):
+    if request.user.is_authenticated:
+        return redirect('index')
+    
+    elif request.method == 'POST':
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        password2 = request.POST.get('password2')
+        if password != password2:
+            return render(request, 'register.html', {'error': "Password do not match"} )
+        if User.objects.filter(username=username).exists():
+            return render(request, 'register.html', {'error': "User already exists"})
+        if User.objects.filter(email=email).exists():
+            return render(request, 'register.html', {'error': "Email already exists"})
+        user = User.objects.create_user(username=username, password=password, email=email)
+        user.save()
+        return redirect('login')
+    else:
+        return render(request, 'register.html')

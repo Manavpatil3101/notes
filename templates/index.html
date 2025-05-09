@@ -23,7 +23,7 @@
 </head>
 
 <body class="bg-gray-100 min-h-screen text-gray-800 transition-colors duration-300">
-  <header class="flex items-center justify-between px-8 py-4 bg-white shadow-md dark:bg-gray-800 dark:text-white">
+  <!-- <header class="flex items-center justify-between px-8 py-4 bg-white shadow-md dark:bg-gray-800 dark:text-white">
     <div class="flex items-center gap-3">
       <img src="{% static 'keep-icon.png' %}" alt="Keep Icon" class="h-8">
       <h1 class="text-xl font-medium">Keep Clone</h1>
@@ -42,12 +42,15 @@
   <nav class="bg-white dark:bg-gray-800 border-y border-gray-300 dark:border-gray-700 px-8 py-3">
     <ul class="flex gap-6 font-medium">
       <li class="cursor-pointer text-yellow-500 border-b-2 border-yellow-500">Notes</li>
-      <li class="cursor-pointer hover:text-yellow-500">Reminders</li>
+      <li class="cursor-pointer hover:text-yellow-500">Favourites</li>
       <li class="cursor-pointer hover:text-yellow-500">Labels</li>
       <li class="cursor-pointer hover:text-yellow-500">Archive</li>
       <li class="cursor-pointer hover:text-yellow-500">Trash</li>
     </ul>
-  </nav>
+  </nav> -->
+
+
+{% include 'header.html' %}
 
   <main class="p-6">
     <section class="max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 mb-6">
@@ -68,15 +71,13 @@
           <h3 class="text-gray-700 dark:text-gray-300">{{ task.note }}</h3>
 
           <!-- Star Toggle (Django Form) -->
-          <form action="{% url 'toggle_star' task.id %}" method="post" class="mt-2 inline-block">
+          <form  method="post" class="mt-2 inline-block">
             {% csrf_token %}
-            <button type="submit">
-              {% if task.is_starred %}
-                <img src="{% static 'assets/icons/star (1).png' %}" alt="Starred" class="inline w-8 h-8 my-4">
-              {% else %}
-                <img src="{% static 'assets/icons/star.png' %}" alt="Not Starred" class="inline w-8 h-8 my-4">
-              {% endif %}
-            </button>
+            <button type="submit" class="like-button" id="{{ task.id }}">
+              <img src="{% static 'assets/icons/' %}{% if task.is_starred %}star (1).png{% else %}star.png{% endif %}"
+                   alt="{% if task.is_starred %}Starred{% else %}Not Starred{% endif %}"
+                   class="inline w-8 h-8 my-4">
+            </button>           
           </form>
 
           <!-- Delete button -->
@@ -91,15 +92,54 @@
     </section>
   </main>
 
-  <footer class="text-center py-4 bg-white dark:bg-gray-800 shadow-inner dark:text-white">
+
+  {% include 'footer.html' %}
+
+
+  <!-- <footer class="text-center py-4 bg-white dark:bg-gray-800 shadow-inner dark:text-white">
     <p>&copy; 2025 Keep Clone. All rights reserved.</p>
-  </footer>
+  </footer> -->
 
   <!-- JavaScript: only for dark mode toggle -->
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
   <script>
-    document.getElementById("darkModeToggle").addEventListener("click", () => {
+   /* document.getElementById("darkModeToggle").addEventListener("click", () => {
       document.documentElement.classList.toggle("dark");
+    }); */
+
+    $(document).on('click', '.like-button', function(e){
+      e.preventDefault();
+    
+      const button = $(this);
+      const taskId = button.attr('id');
+    
+      $.ajax({
+        url: "/toggle_star/" + taskId + "/",
+        type: "POST",
+        data: {
+          csrfmiddlewaretoken: '{{ csrf_token }}'
+        },
+        success: function(response){
+          if (response.status === 'success'){
+            const fav = response.is_starred;
+            const img = button.find('img');
+    
+            const newSrc = fav
+              ? '/static/assets/icons/star (1).png'
+              : '/static/assets/icons/star.png';
+    
+            img.attr('src', newSrc);
+            img.attr('alt', fav ? 'Starred' : 'Not Starred');
+          }
+        },
+        error: function(xhr){
+          console.error('AJAX error:', xhr.responseText);
+        }
+      });
     });
+    
   </script>
 </body>
 </html>
