@@ -1,2 +1,2 @@
-Demo:- [Link Text](notes-nu-lac.vercel.app)
+Demo:- [Notes](notes-nu-lac.vercel.app)
 
